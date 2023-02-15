@@ -41,7 +41,12 @@ if __name__ == "__main__":
         rsp = Response()
         rsp.ParseFromString(sock.recv_msg().bytes)
         print(f"{rsp}")
+
+        req.func = 0x30  # FUNC_ENABLE_RECV_TXT
+        data = req.SerializeToString()
+        print(f"{datetime.now()}: {data}")
+        sock.send(data)
         while True:
             rsp = Response()
             rsp.ParseFromString(sock.recv_msg().bytes)
-            print(f"{rsp}")
+            print(f"{datetime.now()}:\n{rsp}")
