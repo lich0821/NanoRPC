@@ -42,7 +42,7 @@ message Request
     oneof msg
     {
         Empty empty    = 2;
-        String string  = 3;
+        string str     = 3;
         TextMsg txt    = 4;
         ImageMsg img   = 5;
         DbQuery query  = 6;
@@ -56,7 +56,7 @@ message Response
     oneof msg
     {
         int32 status      = 2;
-        String string     = 3;
+        string str        = 3;
         WxMsg wxmsg       = 4;
         MsgTypes types    = 5;
         Contacts contacts = 6;
@@ -108,8 +108,6 @@ message Contact
 message Contacts { repeated Contact contacts = 1; }
 
 message DbNames { repeated string names = 1; }
-
-message String { string str = 1; }
 
 message DbTable
 {
