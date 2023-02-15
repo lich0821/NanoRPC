@@ -6,5 +6,6 @@ Release/
 
 *.pb.c
 *.pb.h
+*pb2.py
 
 __pycache__/
