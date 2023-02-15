@@ -116,6 +116,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>iphlpapi.lib;wsock32.lib;ws2_32.lib;crypt32.lib;nng.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>cd $(SolutionDir)Common\proto
+C:\Tools\nanopb\protoc --nanopb_out=. wcferry.proto</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate fiiles</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
