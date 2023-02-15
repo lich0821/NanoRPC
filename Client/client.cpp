@@ -2,7 +2,7 @@
 #include <vector>
 
 #include <nng/nng.h>
-#include <nng/protocol/reqrep0/req.h>
+#include <nng/protocol/pair1/pair.h>
 #include <pb_decode.h>
 #include <pb_encode.h>
 
@@ -18,8 +18,8 @@ void print_buffer(uint8_t *buffer, size_t len)
 
 bool req_is_login(uint8_t *out, size_t *out_len)
 {
-    Request req   = Request_init_default;
-    req.func      = Functions_FUNC_IS_LOGIN;
+    Request req = Request_init_default;
+    req.func    = Functions_FUNC_IS_LOGIN;
     // req.which_msg = Request_empty_tag;
 
     if (!pb_get_encoded_size(out_len, Request_fields, &req)) {
@@ -71,16 +71,14 @@ int main(int argc, char **argv)
     nng_dialer dialer;
     int rv;
 
-    if ((rv = nng_req0_open(&sock)) != 0) {
-        printf("nng_req0_open: %d\n", rv);
+    if ((rv = nng_pair1_open(&sock)) != 0) {
+        printf("nng_pair1_open: %d\n", rv);
         return -1;
     }
-    if ((rv = nng_dialer_create(&dialer, sock, url)) != 0) {
-        printf("nng_dialer_create: %d\n", rv);
-        return -2;
-    }
 
-    nng_dialer_start(dialer, 0);
+    if ((rv = nng_dial(sock, url, NULL, 0)) != 0) {
+        printf("nng_dial: %d\n", rv);
+    }
 
     uint8_t *in   = NULL;
     size_t in_len = 0, out_len = 0;

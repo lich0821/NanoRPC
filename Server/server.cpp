@@ -4,8 +4,7 @@
 #include <string>
 
 #include <nng/nng.h>
-#include <nng/protocol/reqrep0/rep.h>
-
+#include <nng/protocol/pair1/pair.h>
 #include <pb_decode.h>
 #include <pb_encode.h>
 
@@ -112,11 +111,10 @@ bool dispatcher(uint8_t *in, size_t in_len, uint8_t *out, size_t *out_len)
             break;
         }
         case Functions_FUNC_SEND_TXT: {
-            printf("[FUNC_SEND_TXT]\n");
+            printf("[Functions_FUNC_SEND_TXT]\n");
             ret = func_send_txt(req.msg.txt, out, out_len);
             break;
         }
-
         default: {
             printf("[UNKNOW FUNCTION]\n");
             break;
@@ -136,14 +134,13 @@ int main(int argc, char **argv)
     nng_listener listener;
     int rv;
 
-    if ((rv = nng_rep0_open(&sock)) != 0) {
-        printf("nng_rep0_open: %d\n", rv);
+    if ((rv = nng_pair1_open(&sock)) != 0) {
+        printf("nng_pair0_open: %d\n", rv);
     }
 
-    if ((rv = nng_listener_create(&listener, sock, url)) != 0) {
-        printf("nng_listener_create: %d\n", rv);
+    if ((rv = nng_listen(sock, url, NULL, 0)) != 0) {
+        printf("nng_listen: %d\n", rv);
     }
-    nng_listener_start(listener, 0);
     printf("listening on %s\n", url);
 
     static uint8_t out[1024 * 1024] = { 0 };

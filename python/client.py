@@ -12,7 +12,7 @@ def handler(sig, frame):
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, handler)
     url = "tcp://127.0.0.1:5555"
-    with pynng.Req0() as sock:
+    with pynng.Pair1() as sock:
         sock.dial(url)
         while True:
             req = Request()
