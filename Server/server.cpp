@@ -1,4 +1,5 @@
 #include <conio.h> // _getch()
+#include <map>
 #include <stdio.h>
 #include <string>
 
@@ -9,6 +10,8 @@
 #include <pb_encode.h>
 
 #include "wcferry.pb.h"
+
+std::map<int, std::string> g_types = { { 0x01, "文字" }, { 0x03, "图片" }, { 0x22, "语音" } };
 
 void print_buffer(uint8_t *buffer, size_t len)
 {
@@ -24,6 +27,33 @@ bool func_is_login(uint8_t *out, size_t *len)
     rsp.func       = Functions_FUNC_IS_LOGIN;
     rsp.which_msg  = Response_status_tag;
     rsp.msg.status = 1;
+    if (!pb_get_encoded_size(len, Response_fields, &rsp)) {
+        return false;
+    }
+
+    pb_ostream_t stream = pb_ostream_from_buffer(out, *len);
+    if (!pb_encode(&stream, Response_fields, &rsp)) {
+        printf("Encoding failed: %s\n", PB_GET_ERROR(&stream));
+        return false;
+    }
+
+    return true;
+}
+
+bool func_get_msg_types(uint8_t *out, size_t *len)
+{
+    Response rsp              = Response_init_default;
+    rsp.func                  = Functions_FUNC_GET_SELF_WXID;
+    rsp.which_msg             = Response_types_tag;
+    rsp.msg.types.types_count = g_types.size();
+
+    size_t i = 0;
+    for (auto it = g_types.begin(); it != g_types.end(); it++) {
+        rsp.msg.types.types[i].key = it->first;
+        sprintf(rsp.msg.types.types[i].value, it->second.c_str());
+        i++;
+    }
+
     if (!pb_get_encoded_size(len, Response_fields, &rsp)) {
         return false;
     }
@@ -53,6 +83,11 @@ bool dispatcher(uint8_t *in, size_t in_len, uint8_t *out, size_t *out_len)
         case Functions_FUNC_IS_LOGIN: {
             printf("[Functions_FUNC_IS_LOGIN]\n");
             ret = func_is_login(out, out_len);
+            break;
+        }
+        case Functions_FUNC_GET_MSG_TYPES: {
+            printf("[Functions_FUNC_GET_MSG_TYPES]\n");
+            ret = func_get_msg_types(out, out_len);
             break;
         }
 
