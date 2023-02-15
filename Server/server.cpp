@@ -67,6 +67,27 @@ bool func_get_msg_types(uint8_t *out, size_t *len)
     return true;
 }
 
+bool func_send_txt(TextMsg txt, uint8_t *out, size_t *len)
+{
+    Response rsp   = Response_init_default;
+    rsp.func       = Functions_FUNC_SEND_TXT;
+    rsp.which_msg  = Response_status_tag;
+    rsp.msg.status = 0;
+    printf("%s, %s, %s\n", txt.msg, txt.receiver, txt.aters);
+
+    if (!pb_get_encoded_size(len, Response_fields, &rsp)) {
+        return false;
+    }
+
+    pb_ostream_t stream = pb_ostream_from_buffer(out, *len);
+    if (!pb_encode(&stream, Response_fields, &rsp)) {
+        printf("Encoding failed: %s\n", PB_GET_ERROR(&stream));
+        return false;
+    }
+
+    return true;
+}
+
 bool dispatcher(uint8_t *in, size_t in_len, uint8_t *out, size_t *out_len)
 {
     bool ret            = false;
@@ -88,6 +109,11 @@ bool dispatcher(uint8_t *in, size_t in_len, uint8_t *out, size_t *out_len)
         case Functions_FUNC_GET_MSG_TYPES: {
             printf("[Functions_FUNC_GET_MSG_TYPES]\n");
             ret = func_get_msg_types(out, out_len);
+            break;
+        }
+        case Functions_FUNC_SEND_TXT: {
+            printf("[FUNC_SEND_TXT]\n");
+            ret = func_send_txt(req.msg.txt, out, out_len);
             break;
         }
 

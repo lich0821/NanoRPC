@@ -16,7 +16,7 @@ if __name__ == "__main__":
         sock.dial(url)
         while True:
             req = Request()
-            req.func = 0x01
+            req.func = 0x01  # FUNC_IS_LOGIN
             data = req.SerializeToString()
             print(f"{datetime.now()}: {data}")
             sock.send(data)
@@ -24,7 +24,18 @@ if __name__ == "__main__":
             rsp.ParseFromString(sock.recv_msg().bytes)
             print(f"{rsp}")
 
-            req.func = 0x11
+            req.func = 0x11  # FUNC_GET_MSG_TYPES
+            data = req.SerializeToString()
+            print(f"{datetime.now()}: {data}")
+            sock.send(data)
+            rsp = Response()
+            rsp.ParseFromString(sock.recv_msg().bytes)
+            print(f"{rsp}")
+
+            req.func = 0x20  # FUNC_SEND_TXT
+            req.txt.msg = "This is message"
+            req.txt.receiver = "Chuck"
+            req.txt.aters = "@all"
             data = req.SerializeToString()
             print(f"{datetime.now()}: {data}")
             sock.send(data)
